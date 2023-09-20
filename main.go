@@ -16,32 +16,72 @@ func main() {
 
 	expressionCheck := check(expression)
 	result := calculate(expressionCheck)
-	fmt.Printf("Output: %d \n", result)
+	fmt.Printf("Output: %s \n", result)
 }
 
-func calculate(expression map[int]string) int {
-	var result int
+var romansToArabic = map[string]int{
+	"I": 1,
+	"V": 5,
+	"X": 10,
+	"L": 50,
+	"C": 100,
+	"D": 500,
+	"M": 1000,
+}
+
+var arabicsToRoman = map[int]string{
+	1:    "I",
+	4:    "IV",
+	5:    "V",
+	9:    "IX",
+	10:   "X",
+	40:   "XL",
+	50:   "L",
+	90:   "XC",
+	100:  "C",
+	400:  "CD",
+	500:  "D",
+	900:  "CM",
+	1000: "M",
+}
+
+func calculate(expression map[int]string) string {
+	var res int
+	var result string
 
 	var operand1, _ = strconv.Atoi(expression[0])
 	var operand2, _ = strconv.Atoi(expression[2])
 	var operator = expression[1]
+	var flag = expression[3]
+
 	switch operator {
 	case "+":
-		result = operand1 + operand2
+		res = operand1 + operand2
 	case "-":
-		result = operand1 - operand2
+		res = operand1 - operand2
 	case "*":
-		result = operand1 * operand2
+		res = operand1 * operand2
 	case "/":
 		if operand2 == 0 {
 			fmt.Println("деление на ноль")
 			os.Exit(1)
 		}
-		result = operand1 / operand2
+		res = operand1 / operand2
 	default:
-		fmt.Println("неизвестный оператор", operand1)
+		fmt.Println("неизвестный оператор", operator)
 		os.Exit(1)
 	}
+
+	if flag == "roman" {
+		if res <= 0 {
+			fmt.Print("в римской системе исчесления нет отрицательных чисел")
+			os.Exit(1)
+		}
+		result = arabicToRoman(res)
+	} else {
+		result = strconv.Itoa(res)
+	}
+
 	return result
 }
 
@@ -49,6 +89,8 @@ func check(expr string) map[int]string {
 	expr = strings.TrimSpace(expr)
 
 	parts := strings.Split(expr, " ")
+	var flag1 string
+	var flag2 string
 
 	if len(parts) > 3 {
 		fmt.Print("неверное выражение, много аргументов")
@@ -58,28 +100,52 @@ func check(expr string) map[int]string {
 		os.Exit(1)
 	}
 
-	operand1, _ := strconv.Atoi(parts[0])
-	operand2, _ := strconv.Atoi(parts[2])
+	parts0Rom := romanToArabic(parts[0])
+	parts2Rom := romanToArabic(parts[2])
+	var operand1, operand2 string
 
-	if operand1 <= 0 || operand1 > 10 {
-		fmt.Print("неверный первый операнд, должен быть целым числом от 1 до 10")
-		os.Exit(1)
+	if parts0Rom != 0 {
+		operand1 = strconv.Itoa(parts0Rom)
+		flag1 = "roman"
+	} else {
+		parts0Arab, _ := strconv.Atoi(parts[0])
+		if parts0Arab <= 0 || parts0Arab > 10 {
+			fmt.Print("неверный первый операнд, должен быть целым числом от 1 до 10")
+			os.Exit(1)
+		}
+		operand1 = strconv.Itoa(parts0Arab)
+		flag1 = "arabic"
 	}
 
-	if operand2 <= 0 || operand2 > 10 {
-		fmt.Print("неверный второй операнд, должен быть целым числом от 1 до 10")
+	if parts2Rom != 0 {
+		operand2 = strconv.Itoa(parts2Rom)
+		flag2 = "roman"
+	} else {
+		parts2Arab, _ := strconv.Atoi(parts[2])
+		if parts2Arab <= 0 || parts2Arab > 10 {
+			fmt.Print("неверный второй операнд, должен быть целым числом от 1 до 10")
+			os.Exit(1)
+		}
+		operand2 = strconv.Itoa(parts2Arab)
+		flag2 = "arabic"
+	}
+
+	if flag1 != flag2 {
+		fmt.Print("оба операнда долджны быть из одной системы исчесления")
 		os.Exit(1)
 	}
 
 	var expCheck = map[int]string{
-		0: strconv.Itoa(operand1),
+
+		0: operand1,
 		1: parts[1],
-		2: strconv.Itoa(operand2),
+		2: operand2,
+		3: flag1,
 	}
 	return expCheck
 }
 
-func integerToRoman(number int) string {
+func arabicToRoman(number int) string {
 	maxRomanNumber := 3999
 	if number > maxRomanNumber {
 		return strconv.Itoa(number)
@@ -115,19 +181,27 @@ func integerToRoman(number int) string {
 	return roman.String()
 }
 
-//получение выражения из консоли
-//разбить выражение на массив по пробелу
+func romanToArabic(romanNum string) int {
+	fChar := strings.Split(romanNum, "")
 
-/*определить значение в нулевом индексе;
-если не число, сравнить с массивом римских цифр;
-если не совпадает, вывести ошибку
-если вначале минус, вывести ошибку
-если не число и не римская цифра, то вывести ошибку;
-если не целое число вывести ошибку;
-*/
+	if fChar[0] == "-" {
+		fmt.Print("Римская цифра не может быть отрицательной")
+		os.Exit(1)
+	}
 
-// определить первый индекс массива
-// определить математическую операцию
-// вызвать функию с мат операцие
-// проверить результат, если результат не удовлетворяет условиям вывести ошибку
-// вывести результат
+	result := 0
+	for i := 0; i < len(romanNum); i++ {
+		current := romansToArabic[string(romanNum[i])]
+		if i+1 < len(romanNum) {
+			next := romansToArabic[string(romanNum[i+1])]
+			if current < next {
+				result -= current
+			} else {
+				result += current
+			}
+		} else {
+			result += current
+		}
+	}
+	return result
+}
