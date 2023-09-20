@@ -11,13 +11,12 @@ import (
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Println("Введите выражение")
+	fmt.Println("Input")
 	expression, _ := reader.ReadString('\n')
 
 	expressionCheck := check(expression)
 	result := calculate(expressionCheck)
 	fmt.Printf("Output: %d \n", result)
-	fmt.Println(integerToRoman(result))
 }
 
 func calculate(expression map[int]string) int {
@@ -62,20 +61,20 @@ func check(expr string) map[int]string {
 	operand1, _ := strconv.Atoi(parts[0])
 	operand2, _ := strconv.Atoi(parts[2])
 
-	if operand1 < 0 || operand1 > 10 {
-		fmt.Print("неверный первый операнд, должен быть от 1 до 10")
+	if operand1 <= 0 || operand1 > 10 {
+		fmt.Print("неверный первый операнд, должен быть целым числом от 1 до 10")
 		os.Exit(1)
 	}
 
-	if operand2 < 0 || operand2 > 10 {
-		fmt.Print("неверный второй операнд, должен быть от 1 до 10")
+	if operand2 <= 0 || operand2 > 10 {
+		fmt.Print("неверный второй операнд, должен быть целым числом от 1 до 10")
 		os.Exit(1)
 	}
 
 	var expCheck = map[int]string{
-		0: parts[0],
+		0: strconv.Itoa(operand1),
 		1: parts[1],
-		2: parts[2],
+		2: strconv.Itoa(operand2),
 	}
 	return expCheck
 }
