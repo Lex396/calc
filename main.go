@@ -74,7 +74,7 @@ func calculate(expression map[int]string) string {
 
 	if flag == "roman" {
 		if res <= 0 {
-			fmt.Print("в римской системе исчесления нет отрицательных чисел")
+			fmt.Print("в римской системе исчисления нет отрицательных чисел")
 			os.Exit(1)
 		}
 		result = arabicToRoman(res)
@@ -131,7 +131,7 @@ func check(expr string) map[int]string {
 	}
 
 	if flag1 != flag2 {
-		fmt.Print("оба операнда долджны быть из одной системы исчесления")
+		fmt.Print("оба операнда должны быть из одной системы исчисления")
 		os.Exit(1)
 	}
 
