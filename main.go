@@ -153,11 +153,13 @@ func arabicToRoman(number int) string {
 		return strconv.Itoa(number)
 	}
 
-	var roman strings.Builder
-	var keys []int
+	var roman strings.Builder // string for answers in Roman numerals
+	var keys []int            // key for sorting
+	// filling keys, key map arabicsToRoman
 	for k := range arabicsToRoman {
 		keys = append(keys, k)
 	}
+	// reverse sorting
 	sort.Sort(sort.Reverse(sort.IntSlice(keys)))
 
 	for _, k := range keys {
